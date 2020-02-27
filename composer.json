@@ -27,5 +27,7 @@
                 "DialogflowBackup": "FilippoToso\\DialogflowBackup\\Facade"
             }
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
