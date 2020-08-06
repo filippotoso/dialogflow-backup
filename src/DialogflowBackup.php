@@ -25,7 +25,7 @@ class DialogflowBackup
         $client = new AgentsClient($this->options);
 
         $formattedParent = $client->projectName($this->projectId);
-        $response = $client->exportAgent($formattedParent, '');
+        $response = $client->exportAgent($formattedParent);
 
         $response->pollUntilComplete();
 
