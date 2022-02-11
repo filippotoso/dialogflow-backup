@@ -2,29 +2,32 @@
 
 namespace FilippoToso\DialogflowBackup;
 
-use BackupException;
+use FilippoToso\DialogflowBackup\Exceptions\BackupException;
 use Google\Cloud\Dialogflow\V2\AgentsClient;
-use Google\Cloud\Dialogflow\V2\SessionsClient;
-use Google\Cloud\Dialogflow\V2\TextInput;
-use Google\Cloud\Dialogflow\V2\QueryInput;
-use Google\Protobuf\Struct;
 
 class DialogflowBackup
 {
     protected $projectId;
+    protected $locationId;
     protected $options = [];
 
-    public function __construct(array $options, $projectId)
+    public function __construct(array $options, $projectId, $locationId = null)
     {
         $this->options = $options;
         $this->projectId = $projectId;
+        $this->locationId = $locationId;
     }
 
     public function export($filename)
     {
         $client = new AgentsClient($this->options);
 
-        $formattedParent = $client->projectName($this->projectId);
+        if ($this->locationId) {
+            $formattedParent = $client->locationName($this->projectId, $this->locationId);
+        } else {
+            $formattedParent = $client->projectName($this->projectId);
+        }
+
         $response = $client->exportAgent($formattedParent, '');
 
         $response->pollUntilComplete();
@@ -46,7 +49,11 @@ class DialogflowBackup
     {
         $client = new AgentsClient($this->options);
 
-        $formattedParent = $client->projectName($this->projectId);
+        if ($this->locationId) {
+            $formattedParent = $client->locationName($this->projectId, $this->locationId);
+        } else {
+            $formattedParent = $client->projectName($this->projectId);
+        }
 
         $response = $client->importAgent($formattedParent, [
             'agentContent' => file_get_contents($filename),
@@ -65,7 +72,11 @@ class DialogflowBackup
     {
         $client = new AgentsClient($this->options);
 
-        $formattedParent = $client->projectName($this->projectId);
+        if ($this->locationId) {
+            $formattedParent = $client->locationName($this->projectId, $this->locationId);
+        } else {
+            $formattedParent = $client->projectName($this->projectId);
+        }
 
         $response = $client->restoreAgent($formattedParent, [
             'agentContent' => file_get_contents($filename),
